@@ -11,10 +11,10 @@ from PyQt5.QtWidgets import QMessageBox, QApplication, QWidget, QProgressDialog,
 from PyQt5.uic.properties import QtGui
 from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm
 
-from gui import main
+from gui import main, result_window
 from nrp_logic.algorithms import NSGAII_Repair, Repairer
 from nrp_logic.entities import NRPInstance
-from nrp_logic.nrp import NRP_Problem_MO, NRP_Problem_SO
+from nrp_logic.nrp import NRP_Problem_MO, NRP_Problem_SO, make_solutions
 from util.file_reader import AbstractFileReader, ClassicFileReader, FileReader
 
 
@@ -100,12 +100,19 @@ class Worker(QRunnable):
 class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.threadpool = QThreadPool()
         self.setupUi(self)
+
+        self.threadpool = QThreadPool()
+        self.result = None
+        self.nrp_instance = None
         self.btnBrowseFiles.clicked.connect(self.browse_folder)
         self.btnRunSolver.clicked.connect(self.run_algorithm)
+        # TODO uncomment
+        # self.btnShowResults.setDisabled(True)
+        self.btnShowResults.clicked.connect(self.show_result_window)
 
     def run_algorithm(self):
+        # TODO delete line for testing
         self.lineFilePath.setText('C:/Users/Lar/Documents/Study/CouseWork-3/PyProgramNRP/test_data/classic/nrp3.txt')
         # self.radioClassicFormat.setChecked()
 
@@ -121,109 +128,65 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow):
         else:
             reader = FileReader()
         try:
-            nrp_instance: NRPInstance = reader.read_nrp_instance(filename=file_path)
+            self.nrp_instance: NRPInstance = reader.read_nrp_instance(filename=file_path)
         except Exception as ex:
             self.show_file_error(ex)
             return
         # Multi or Single
         nrp_problem: Problem = None
         if self.radioMulti.isChecked():
-            nrp_problem = NRP_Problem_MO(nrp_instance)
+            nrp_problem = NRP_Problem_MO(self.nrp_instance)
         else:
-            nrp_problem = NRP_Problem_SO(nrp_instance)
+            nrp_problem = NRP_Problem_SO(self.nrp_instance)
 
         algorithm: AbstractGeneticAlgorithm = None
         #  Dep or without dep
         if self.radioDependYes.isChecked():
             # TODO fix req for rep
-            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(nrp_instance.requirements))
+            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements))
         else:
             algorithm = NSGAII(nrp_problem)
         #  Take n runs
         try:
             nruns = int(self.lineNumOfRuns.text())
+            if nruns < 1 or nruns > 1000000:
+                self.show_simple_error("Number of runs must be between 1 and 1000000!")
+                return
         except ValueError:
             self.show_simple_error("Number of runs must be integer!")
             return
-        # t = threading.Thread()
-        # msg = QMessageBox()
-        # msg.setText("Please wait to connect to the server.")
-        # msg.setWindowTitle("Checking for update.")
-        # msg.exec_()
-        # print("Start!")
-        # self.setOverrideCursor(Qt.WaitCursor)
-        # self.setCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        # self.overlay = Overlay(self.centralWidget())
-        # self.overlay.show()
-        # algorithm.run(nruns)
-        # self.overlay.hide()
-        # self.btnRunSolver.blockSignals()
-        # button.clicked.connect(self.overlay.show)
+
+        # TODO fix this
         def run_and_back():
             algorithm.run(nruns)
-            # print("Done!")
-            # algorithm.run(nruns)
-            # self.threadpool.start()
-            # msg.done(0)
             print(len(algorithm.result))
             solutions: List[Solution] = nondominated(algorithm.result)
             solutions = [sol for sol in solutions if sol.feasible]
             print(len(solutions))
-            # self.progressBar.
-            self.result = sorted(solutions, key=lambda x: x.objectives[0], reverse=True)
-            # progress.hide()
+            result = sorted(solutions, key=lambda x: x.objectives[0], reverse=True)
+            self.result = make_solutions(self.nrp_instance, result)
+            #  TODO separate method
             self.view.hide()
             QApplication.restoreOverrideCursor()
             self.setDisabled(False)
+            self.btnShowResults.setDisabled(False)
+            self.btnShowResults.setStyleSheet("background-color: lime")
 
-            # with wait_cursor():
-        #     self.setCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-            # self.setDisabled(True)
-        #
         def set_view(view):
-            # if not self.view hasattr(self, 'view'):
-            #     self.view.hide()
             view.show()
             self.view = view
 
             resolution = QDesktopWidget().screenGeometry()
             view.move((resolution.width() / 2) - (view.frameSize().width() / 2),
                       (resolution.height() / 2) - (view.frameSize().height() / 2))
+
         wait = QProgressDialog('Please, wait for algorithm execution...', None, 0, 0)
         wait.setWindowTitle(' ')
         set_view(wait)
-
         self.setDisabled(True)
         QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
         worker = Worker(run_and_back)
-        # worker.finished.connect(run_and_back())
         self.threadpool.start(worker)
-
-        # self.threadpool.waitForDone()
-        # self.setDisabled(False)
-            # algorithm.run(nruns)
-
-            # self.threadpool.thread().wait()
-        # self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
-
-        # print(algorithm.nfe)
-        # worker = Worker(algorithm.run, nruns)
-        # self.threadpool.start(worker)
-        # while len(algorithm.result) == 0:
-        #     print(algorithm.nfe)
-        #     self.progressBar.setValue(algorithm.nfe / nruns)
-        # i = 0
-        # algorithm.
-        # print("Done!")
-        # # algorithm.run(nruns)
-        # # self.threadpool.start()
-        # # msg.done(0)
-        # print(len(algorithm.result))
-        # solutions: List[Solution] = nondominated(algorithm.result)
-        # solutions = [sol for sol in solutions if sol.feasible]
-        # print(len(solutions))
-        # # self.progressBar.
-        # result = sorted(solutions, key=lambda x: x.objectives[0], reverse=True)
 
     def show_simple_error(self, text: str):
         msg = QMessageBox()
@@ -245,6 +208,40 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow):
     def browse_folder(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Choose file with NRP instance")
         self.lineFilePath.setText(path)
+
+    def show_result_window(self):
+        ResultWindow(self, self.result, self.nrp_instance).show()
+
+
+class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindiw):
+    def __init__(self, parent, result, nrp_instance):
+        super().__init__(parent=parent)
+        self.setupUi(self)
+        self.result = result
+        self.nrp_instance = nrp_instance
+        self.fill_table()
+        self.btnSaveResult.clicked.connect(self.save_result)
+        self.btnVisualize.clicked.connect(self.show_visualisation)
+
+    def fill_table(self):
+        # TODO implement
+        table = self.tableResult
+        labels = ['№', 'Total score', 'Total Cost', 'List of requirements']
+        table.setColumnCount(len(labels))
+        table.setRowCount(1)
+        table.setHorizontalHeaderLabels(labels)
+        # table.horizontalHeaderItem().setTextAlignment(QtCore.Qt.AlignHCenter)
+        # table.setItem(0, 0, 0, 0, 0)
+
+    def show_visualisation(self):
+        # TODO implement
+        pass
+
+    def save_result(self):
+        # TODO implement
+        if self.checkSaveImg.isChecked():
+            print('1')
+        pass
 
 
 def main():

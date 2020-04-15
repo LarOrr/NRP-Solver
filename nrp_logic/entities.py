@@ -1,4 +1,6 @@
 from typing import List, Set
+
+
 # from __future__ import annotations
 
 
@@ -35,7 +37,8 @@ class Stakeholder:
 class NRPInstance:
     # __metaclass__ = ABCMeta
 
-    def __init__(self, requirements: List[Requirement] = None, stakeholders: List[Stakeholder] = None, budget=None, budget_ratio=None):
+    def __init__(self, requirements: List[Requirement] = None, stakeholders: List[Stakeholder] = None, budget=None,
+                 budget_ratio=None):
         self.requirements = requirements
         self.stakeholders = stakeholders
         if budget is None:
@@ -83,3 +86,10 @@ class NRPInstance:
             req.add_prerequisite(prereq)
             for p in prereq.prerequisites:
                 stack.append(p)
+
+
+class NRPSolution():
+    def __init__(self, total_score: float, total_cost: float, requirements: List[Requirement]):
+        self.total_cost = total_cost
+        self.total_score = total_score
+        self.requirements = requirements

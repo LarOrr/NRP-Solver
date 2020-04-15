@@ -1,0 +1,17 @@
+B 10000
+^budget
+(or:
+R 0.3)
+5
+^number of requirements
+Req 1;123; PRE 2; PRE 4
+^ Name of req; ^ Cost; ^ Type of dependency(PRE) and requirement(2 and 4) - spaces between ; doesn't affect anything
+Req 2;120; PRE 2; PRE 4
+Req 3;100000000000; PRE 2; PRE 4
+Req 4: Cool req 4!!!!! ; 12223 ; PRE 2; PRE 4
+Req 5;12122; PRE 2; PRE 4; AND 2
+2
+^ Num of stakeholders
+Stake 1;0.8; 1 100; 5 10000000000000000000; 2 2
+^ Name of stakeholder ; ^ Weight(0,8); ^ Requirement number(1) and value from stakeholder (100)
+Stake 2;0.2; 2 0.01; 2 2.12
