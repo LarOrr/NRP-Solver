@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ResultWindow(object):
     def setupUi(self, ResultWindow):
         ResultWindow.setObjectName("ResultWindow")
-        ResultWindow.resize(417, 261)
+        ResultWindow.resize(417, 308)
         self.centralwidget = QtWidgets.QWidget(ResultWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -41,6 +41,12 @@ class Ui_ResultWindow(object):
         self.btnSaveResult.setObjectName("btnSaveResult")
         self.horizontalLayout.addWidget(self.btnSaveResult)
         self.verticalLayout.addLayout(self.horizontalLayout)
+        self.labelTotalInfo = QtWidgets.QLabel(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.labelTotalInfo.setFont(font)
+        self.labelTotalInfo.setObjectName("labelTotalInfo")
+        self.verticalLayout.addWidget(self.labelTotalInfo)
         self.labelSolution = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(11)
@@ -70,4 +76,5 @@ class Ui_ResultWindow(object):
         self.btnVisualize.setText(_translate("ResultWindow", "Visualize Result"))
         self.checkSaveImg.setText(_translate("ResultWindow", "Save with image"))
         self.btnSaveResult.setText(_translate("ResultWindow", "Save result to .csv"))
+        self.labelTotalInfo.setText(_translate("ResultWindow", "Budget = {} || Total cost = {} || Total score = {} "))
         self.labelSolution.setText(_translate("ResultWindow", "Found solutions:"))

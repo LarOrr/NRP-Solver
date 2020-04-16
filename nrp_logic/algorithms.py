@@ -48,11 +48,7 @@ class Repairer:
 
 
 class NSGAII_Repair(NSGAII):
-    pass
 
-    # def initialize(self):
-    #     super.__init__()
-    # Overloading of iterate
     def __init__(self, problem: Problem, repairer: Repairer,
                  population_size=100,
                  generator=RandomGenerator(),
@@ -73,6 +69,7 @@ class NSGAII_Repair(NSGAII):
         if self.variator is None:
             self.variator = default_variator(self.problem)
 
+    # Overloading of iterate
     def iterate(self):
         offspring = []
 

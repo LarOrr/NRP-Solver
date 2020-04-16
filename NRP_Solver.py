@@ -11,9 +11,10 @@ from PyQt5 import QtWidgets, QtCore, Qt
 from PyQt5.QtCore import QThreadPool, pyqtSlot, QRunnable
 from PyQt5.QtGui import QCursor, QPalette, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QMessageBox, QApplication, QWidget, QProgressDialog, QDesktopWidget, QTableWidgetItem, \
-    QGridLayout, QLabel
+    QGridLayout, QLabel, QAbstractItemView
 from PyQt5.uic.properties import QtGui
-from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm, GAOperator, SBX, PM
+from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm, GAOperator, SBX, PM, PCX, HUX, \
+    BitFlip, PMX, SPX
 
 import gui
 from gui import main, result_window, picture_window
@@ -121,6 +122,7 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         # TODO DEBUG uncomment
         self.btnShowResults.setDisabled(True)
         self.btnShowResults.clicked.connect(self.show_result_window)
+        self.actionAbout.triggered.connect(self.show_about)
 
     def run_algorithm(self):
         # TODO DEBUG delete line for testing
@@ -155,15 +157,17 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
             nrp_problem = NRP_Problem_SO(self.nrp_instance)
 
         algorithm: AbstractGeneticAlgorithm = None
+        # TODO Move somewhere and add config
+        # Crossover probability is 0.9 and mutation probability = 1 / (size of binary vector)
+        variator = None
+        # TODO single-point crossover?
+        variator = GAOperator(HUX(probability=0.8), BitFlip(probability=1))
         #  Dep or without dep
-        # Crossover probability is 0.8 and mutation probability = 1 / (size of binary vector)
-        # variator = GAOperator(SBX(probability=0.8),
-        #                       PM(probability=(1 / len(self.nrp_instance.requirements))))
         if self.radioDependYes.isChecked():
             # TODO fix req for rep
-            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements)) #, variator=variator)
+            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements), variator=variator)
         else:
-            algorithm = NSGAII(nrp_problem) #, variator=variator)
+            algorithm = NSGAII(nrp_problem, variator=variator)
         #  Take n runs
         try:
             nruns = int(self.lineNumOfRuns.text())
@@ -215,16 +219,31 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         msg.setDetailedText("Additional information about problem:\n{}".format(ex))
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
-        # msg.buttonClicked.connect(msgbtn)
 
     def browse_folder(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Choose file with NRP instance")
         self.lineFilePath.setText(path)
 
+    def show_about(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText('Next Release Problem (NRP) Solver v 1.0')
+        msg.setInformativeText('Developer:\n'
+                               'Illarion Oralin\n'
+                               'HSE University, Faculty of Computer Science\n'
+                               'Software Engineering, 3rd year\n'
+                               '\n2020')
+        msg.setWindowTitle("NRP Solver About")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.exec_()
+
     def show_result_window(self):
         # TODO DEBUG uncomment!
         if self.result is None:
             self.show_simple_error('You have to run the algorithm first!')
+            return
+        elif len(self.result) == 0:
+            self.show_simple_error("0 solution found! Please try to run algorithm with bigger run number!")
             return
         ResultWindow(self, self.result, self.nrp_instance).show()
 
@@ -236,9 +255,10 @@ class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindow, Window)
         self.setupUi(self)
         self.resize(700, 500)
         self.result: List[NRPSolution] = result
-        if len(result) == 0:
-            self.show_simple_error("0 solution found! Please try to run algorithm with bigger run number!")
+        self.close()
         self.nrp_instance = nrp_instance
+        self.labelTotalInfo.setText("Budget = {} || Total possible cost = {} || Total possible score = {} "
+                                    .format(nrp_instance.budget, nrp_instance.total_cost, nrp_instance.total_score))
         self.labels = ['Total score', 'Total Cost', 'List of requirements']
         self.fill_table()
         # TODO save img
@@ -257,6 +277,8 @@ class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindow, Window)
         #                                                                                           name="sfdfr")])]
         # self.resize(417, 261)
         table = self.tableResult
+        table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         # '№',
         # labels = ['Total score', 'Total Cost', 'List of requirements']
         table.setColumnCount(len(self.labels))
@@ -266,13 +288,11 @@ class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindow, Window)
         header = table.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        table.horizontalHeader().setStretchLastSection(True)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        header.setDefaultAlignment(QtCore.Qt.AlignLeft)
+        # table.horizontalHeader().setStretchLastSection(True)
         table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
-        # header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
-        # table.resizeColumnsToContents()
-        # table.horizontalHeaderItem().setTextAlignment(QtCore.Qt.AlignHCenter)
 
-        # table.setItem(0, 0, QTableWidgetItem(str(Requirement(req_id=1, name="))))))"))))
         for i, sol in enumerate(self.result):
             table.setItem(i, 0, QTableWidgetItem(str(sol.total_score)))
             table.setItem(i, 1, QTableWidgetItem(str(sol.total_cost)))
@@ -310,17 +330,10 @@ class PictureWindow(QtWidgets.QMainWindow, picture_window.Ui_PictureWindow):
     def __init__(self, parent, image_path):
         super().__init__(parent=parent)
         self.setupUi(self)
-        # self.title = 'Result visualisation'
-        # self.left = 10
-        # self.top = 10
-        # self.width = 640
-        # self.height = 480
         self.image_path = image_path
         self.show_picture()
 
     def show_picture(self):
-        # self.setWindowTitle(self.title)
-        # self.setGeometry(self.left, self.top, self.width, self.height)
         # Create widget
         label = self.labelPicture
         pixmap = PyQt5.QtGui.QPixmap(self.image_path)

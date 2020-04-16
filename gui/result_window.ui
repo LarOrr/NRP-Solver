@@ -69,7 +69,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="labelBudget">
+     <widget class="QLabel" name="labelTotalInfo">
       <property name="font">
        <font>
         <pointsize>11</pointsize>

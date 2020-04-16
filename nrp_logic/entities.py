@@ -139,7 +139,7 @@ class NRPSolution:
         return separator.join([str(r) for r in self.requirements])
 
 
-def plot_solutions(solutions: List[NRPSolution], budget, title, file_name='temp.png'):
+def plot_solutions(solutions: List[NRPSolution], budget, title, file_name='last_result.png'):
     plt.clf()
     xs = [s.total_score for s in solutions]
     ys = [s.total_cost for s in solutions]

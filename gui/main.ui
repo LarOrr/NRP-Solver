@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>397</width>
-    <height>332</height>
+    <width>402</width>
+    <height>311</height>
    </rect>
   </property>
   <property name="cursor">
@@ -213,15 +213,27 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>397</width>
+     <width>402</width>
      <height>18</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
     <enum>Qt::NoContextMenu</enum>
    </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuMenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
