@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ResultWindiw</class>
- <widget class="QMainWindow" name="ResultWindiw">
+ <class>ResultWindow</class>
+ <widget class="QMainWindow" name="ResultWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>417</width>
-    <height>261</height>
+    <height>308</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,11 +62,35 @@
          </font>
         </property>
         <property name="text">
-         <string>Save result</string>
+         <string>Save result to .csv</string>
         </property>
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelBudget">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Budget = {} || Total cost = {} || Total score = {} </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelSolution">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Found solutions:</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QTableWidget" name="tableResult"/>

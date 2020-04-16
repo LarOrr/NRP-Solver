@@ -146,4 +146,4 @@ class ClassicFileReader(AbstractFileReader):
                 # stakeholder_requirements.append((stakeholder_requirement_value, stakeholder_requirement))
                 stakeholder_requirements[stakeholder_requirement] = stakeholder_requirement_value
             stakeholders.append(Stakeholder(weight=stakeholder_value, values=stakeholder_requirements))
-        return NRPInstance(requirements, stakeholders, budget_ratio=0.7)
+        return NRPInstance(requirements, stakeholders, budget_ratio=0.3)

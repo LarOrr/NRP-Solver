@@ -1,4 +1,5 @@
 from typing import List, Set
+import matplotlib.pyplot as plt
 
 
 # from __future__ import annotations
@@ -21,7 +22,7 @@ class Requirement:
         self.prerequisites.add(prerequisite)
 
     def __str__(self):
-        return "{}".format(self.req_id)
+        return 'Id_{}: "{}"'.format(self.req_id, self.name)
 
 
 class Stakeholder:
@@ -41,23 +42,30 @@ class NRPInstance:
                  budget_ratio=None):
         self.requirements = requirements
         self.stakeholders = stakeholders
+        self.total_cost = None
+        self.total_score = None
+        max_budg = self.__get_max_budget(budget_ratio)
         if budget is None:
-            budget = self.__get_max_budget(budget_ratio)
+            budget = max_budg
         self.budget = budget
         # TODO when? Create controller&
         self.calculate_scores()
         self.trans_closure_all()
 
     def calculate_scores(self):
+        self.total_score = 0
         for r in self.requirements:
             r.score = 0
             for s in self.stakeholders:
                 r.score += s.weight * s.req_values.get(r.req_id, 0)
+            self.total_score += r.score
 
     def __get_max_budget(self, budget_ratio):
+        self.total_cost = 0
         sum = 0
         for req in self.requirements:
             sum += req.cost
+        self.total_cost = sum
         if budget_ratio is None:
             return sum
         return sum * budget_ratio
@@ -76,20 +84,91 @@ class NRPInstance:
         for r in self.requirements:
             self.trans_closure(r)
 
+    # Old version
+    # def trans_closure(self, req: Requirement):
+    #     # new_preq = req.prerequisites.copy()
+    #     stack = list(req.prerequisites)
+    #     while stack:
+    #         prereq = stack.pop()
+    #         if prereq == req:
+    #             raise RuntimeError("Cycle in the requirements dependencies!")
+    #         req.add_prerequisite(prereq)
+    #         for p in prereq.prerequisites:
+    #             stack.append(p)
+
     def trans_closure(self, req: Requirement):
-        # new_preq = req.prerequisites.copy()
-        # TODO check loops!
+        def cycle_error():
+            raise RuntimeError("Cycle in the requirements dependencies!")
+        # To detect a cycle in requirements tree
+        visited = [False] * len(self.requirements)
+        on_stack = [False] * len(self.requirements)
+        # stack = [req]
         stack = list(req.prerequisites)
+        # for r in stack:
+        #     # Check it
+        #     on_stack[r.req_id - 1] = True
         while stack:
             prereq = stack.pop()
-            # TODO list?
-            req.add_prerequisite(prereq)
+            ind = prereq.req_id - 1
+            if not visited[ind]:
+                visited[ind] = True
+                on_stack[ind] = True
+                # Putting back
+                stack.append(prereq)
+            else:
+                on_stack[ind] = False
+            if prereq != req:
+                # Adding prereq
+                req.add_prerequisite(prereq)
+            else:
+                cycle_error()
             for p in prereq.prerequisites:
-                stack.append(p)
+                if not visited[p.req_id - 1]:
+                    stack.append(p)
+                elif on_stack[p.req_id - 1]:
+                    cycle_error()
 
 
-class NRPSolution():
+class NRPSolution:
     def __init__(self, total_score: float, total_cost: float, requirements: List[Requirement]):
         self.total_cost = total_cost
         self.total_score = total_score
         self.requirements = requirements
+
+    def reqs_to_string(self, separator: str) -> str:
+        return separator.join([str(r) for r in self.requirements])
+
+
+def plot_solutions(solutions: List[NRPSolution], budget, title, file_name='temp.png'):
+    plt.clf()
+    xs = [s.total_score for s in solutions]
+    ys = [s.total_cost for s in solutions]
+    # plt.scatter(xs, ys, c='red', label='Infeasible')
+    # feasible_xs = [s.objectives[0] for s in solutions]
+    # feasible_ys = [s.constraints[0] for s in solutions]
+    plt.scatter(xs, ys, c='blue', label='Solutions')
+    # nondominated_xs = [s.objectives[0] for s in nondominated_solutions]
+    # nondominated_ys = [s.constraints[0] for s in nondominated_solutions]
+    # plt.scatter(nondominated_xs, nondominated_ys,
+    #             c='green', label='Nondominated')
+    xmin = min(xs)
+    xmax = max(xs)
+    dx = xmax - xmin
+    margin = 0.1
+    xmin -= dx * margin
+    xmax += dx * margin
+    ymin = min(ys)
+    ymax = max(ys)
+    dy = ymax - ymin
+    ymin -= dy * margin
+    ymax += dy * margin
+    plt.hlines(budget, xmin, xmax, label='Budget')
+    plt.title(title)
+    plt.legend()
+    plt.xlabel("Score")
+    plt.ylabel("Cost")
+    plt.xlim([xmin, xmax])
+    plt.ylim([ymin, ymax])
+    plt.savefig(file_name)
+    return file_name
+

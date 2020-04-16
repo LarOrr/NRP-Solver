@@ -2,6 +2,8 @@ from typing import List
 from platypus import Problem, Binary, Real, RandomGenerator, Solution, NSGAII, nondominated_truncate, nondominated_sort, \
     default_variator, TournamentSelector
 from nrp_logic.entities import Requirement
+
+
 # from nrp_logic.Requirement import Requirement
 # from nrp_logic.Stakeholder import Stakeholder
 
@@ -44,8 +46,10 @@ class Repairer:
                         include_req[i] = False
                         break
 
+
 class NSGAII_Repair(NSGAII):
     pass
+
     # def initialize(self):
     #     super.__init__()
     # Overloading of iterate
