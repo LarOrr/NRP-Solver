@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QMessageBox, QApplication, QWidget, QProgressDialog,
     QGridLayout, QLabel, QAbstractItemView
 from PyQt5.uic.properties import QtGui
 from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm, GAOperator, SBX, PM, PCX, HUX, \
-    BitFlip, PMX, SPX
+    BitFlip, PMX, SPX, TournamentSelector
 
 import gui
 from gui import main, result_window, picture_window
@@ -112,8 +112,9 @@ class Window:
 class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
 
+        self.setupUi(self)
+        self.is_last_single = False
         self.threadpool = QThreadPool()
         self.result = None
         self.nrp_instance = None
@@ -151,6 +152,7 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
             return
         # Multi or Single
         nrp_problem: Problem = None
+        self.is_last_single = not self.radioMulti.isChecked()
         if self.radioMulti.isChecked():
             nrp_problem = NRP_Problem_MO(self.nrp_instance)
         else:
@@ -162,17 +164,18 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         variator = None
         # TODO single-point crossover?
         variator = GAOperator(HUX(probability=0.8), BitFlip(probability=1))
+        selector = TournamentSelector(5)
         #  Dep or without dep
         if self.radioDependYes.isChecked():
             # TODO fix req for rep
-            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements), variator=variator)
+            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements), variator=variator, selector=selector)
         else:
-            algorithm = NSGAII(nrp_problem, variator=variator)
+            algorithm = NSGAII(nrp_problem, variator=variator,selector=selector)
         #  Take n runs
         try:
             nruns = int(self.lineNumOfRuns.text())
-            if nruns < 1 or nruns > 1000000:
-                self.show_simple_error("Number of runs must be between 1 and 1000000!")
+            if nruns < 1 or nruns > 10000000:
+                self.show_simple_error("Number of runs must be between 1 and 10000000!")
                 return
         except ValueError:
             self.show_simple_error("Number of runs must be integer!")
@@ -185,8 +188,15 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
             solutions: List[Solution] = nondominated(algorithm.result)
             solutions = [sol for sol in solutions if sol.feasible]
             print(len(solutions))
-            result = sorted(solutions, key=lambda x: x.objectives[0], reverse=True)
-            self.result = make_solutions(self.nrp_instance, result)
+
+            result: List[NRPSolution] = make_solutions(self.nrp_instance, solutions)
+            # Sorting for 2 objectives First maximize score and then minimize cost
+            result = sorted(result, key=lambda x: x.total_score, reverse=True)
+            if self.is_last_single:
+                result = sorted(result, key=lambda x: x.total_cost)
+                # Taking only solution with minimal cost
+                result = [result[0]]
+            self.result = result
             #  TODO separate method
             self.view.hide()
             QApplication.restoreOverrideCursor()
@@ -257,9 +267,9 @@ class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindow, Window)
         self.result: List[NRPSolution] = result
         self.close()
         self.nrp_instance = nrp_instance
-        self.labelTotalInfo.setText("Budget = {} || Total possible cost = {} || Total possible score = {} "
-                                    .format(nrp_instance.budget, nrp_instance.total_cost, nrp_instance.total_score))
-        self.labels = ['Total score', 'Total Cost', 'List of requirements']
+        self.labelTotalInfo.setText("Budget = {} || Total cost of all req. = {} || Total score of all req. = {} "
+                                    .format(round(nrp_instance.budget, 2), round(nrp_instance.total_cost, 2), round(nrp_instance.total_score, 2)))
+        self.labels = ['Total Score', 'Total Cost', 'List of requirements']
         self.fill_table()
         # TODO save img
         self.checkSaveImg.hide()

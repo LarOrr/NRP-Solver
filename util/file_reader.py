@@ -82,24 +82,40 @@ class FileReader(AbstractFileReader):
 
 class ClassicFileReader(AbstractFileReader):
     def read_nrp_instance(self, filename):
-        stakeholders = []
         requirements = []
 
         file = open(filename, 'r')
         lines = file.readlines()
-        line_index = 0
+
+        budget = None
+        ratio = None
+        line_index = 1
+        # try:
+        temp = lines[0].split()
+        if temp[0] == 'B':
+            # nrp.budget = float(temp[1])
+            budget = float(temp[1].strip())
+        elif temp[0] == 'R':
+            ratio = float(temp[1].strip())
+        else:
+            # If there is no budget or ratio in first line
+            line_index = 0
+        if ratio is None:
+            # Default ratio
+            ratio = 0.3
+
         # 1.1 get requirements
-        number_of_levels = int(lines[0])
+        number_of_levels = int(lines[line_index])
         last_id = 0
         for i in range(number_of_levels):
-            line = lines[(i + 1) * 2]
+            line = lines[line_index + (i + 1) * 2]
             req_costs = line.strip().split()
             for id, req_cost_str in enumerate(req_costs):
-                requirements.append(Requirement(req_id=last_id+id+1, cost=float(req_cost_str)))
+                requirements.append(Requirement(req_id=last_id + id + 1, cost=float(req_cost_str)))
             last_id += len(req_costs)
         # 1.2 transform requirement cost to
 
-        reqs_deps_index = (number_of_levels * 2) + 1
+        reqs_deps_index = line_index + (number_of_levels * 2) + 1
         # TODO deps
         reqs_deps_number = int(lines[reqs_deps_index])
         for i in range(reqs_deps_index + 1, reqs_deps_index + reqs_deps_number):
@@ -146,4 +162,4 @@ class ClassicFileReader(AbstractFileReader):
                 # stakeholder_requirements.append((stakeholder_requirement_value, stakeholder_requirement))
                 stakeholder_requirements[stakeholder_requirement] = stakeholder_requirement_value
             stakeholders.append(Stakeholder(weight=stakeholder_value, values=stakeholder_requirements))
-        return NRPInstance(requirements, stakeholders, budget_ratio=0.3)
+        return NRPInstance(requirements, stakeholders, budget=budget, budget_ratio=ratio)

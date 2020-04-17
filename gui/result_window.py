@@ -43,7 +43,7 @@ class Ui_ResultWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.labelTotalInfo = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
-        font.setPointSize(11)
+        font.setPointSize(10)
         self.labelTotalInfo.setFont(font)
         self.labelTotalInfo.setObjectName("labelTotalInfo")
         self.verticalLayout.addWidget(self.labelTotalInfo)

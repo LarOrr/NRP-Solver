@@ -47,8 +47,10 @@ class NRPInstance:
         max_budg = self.__get_max_budget(budget_ratio)
         if budget is None:
             budget = max_budg
+            if budget_ratio is not None:
+                budget *= budget_ratio
         self.budget = budget
-        # TODO when? Create controller&
+        # TODO when?
         self.calculate_scores()
         self.trans_closure_all()
 
@@ -66,9 +68,7 @@ class NRPInstance:
         for req in self.requirements:
             sum += req.cost
         self.total_cost = sum
-        if budget_ratio is None:
-            return sum
-        return sum * budget_ratio
+        return sum
 
     def get_score_cost(self, candidate: List[bool]):
         # score is a sum of all customer weighted scores
@@ -102,11 +102,7 @@ class NRPInstance:
         # To detect a cycle in requirements tree
         visited = [False] * len(self.requirements)
         on_stack = [False] * len(self.requirements)
-        # stack = [req]
         stack = list(req.prerequisites)
-        # for r in stack:
-        #     # Check it
-        #     on_stack[r.req_id - 1] = True
         while stack:
             prereq = stack.pop()
             ind = prereq.req_id - 1

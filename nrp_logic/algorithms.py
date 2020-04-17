@@ -3,27 +3,6 @@ from platypus import Problem, Binary, Real, RandomGenerator, Solution, NSGAII, n
     default_variator, TournamentSelector
 from nrp_logic.entities import Requirement
 
-
-# from nrp_logic.Requirement import Requirement
-# from nrp_logic.Stakeholder import Stakeholder
-
-# # TODO put somewhere
-# def repair_all(sols: List[Solution], requirements: List[Requirement]):
-#     for s in sols:
-#         repair(s)
-#
-# # TODO positive repair
-# def repair(sol: Solution, requirements: List[Requirement]):
-#     # req_vector = sol.variables[0]
-#     for i, is_met in enumerate(sol.variables[0]):
-#         # ! Transitive closed requirement!!
-#         if is_met:
-#             delete = False
-#             req = requirements[i]
-#             for prereq in req.prerequisites:
-#                 s
-
-
 class Repairer:
     def __init__(self, requirements: List[Requirement]):
         self.requirements = requirements
