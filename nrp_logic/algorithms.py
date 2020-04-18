@@ -1,6 +1,8 @@
 from typing import List
-from platypus import Problem, Binary, Real, RandomGenerator, Solution, NSGAII, nondominated_truncate, nondominated_sort, \
+
+from platypus import Problem, RandomGenerator, Solution, NSGAII, nondominated_truncate, nondominated_sort, \
     default_variator, TournamentSelector
+
 from nrp_logic.entities import Requirement
 
 

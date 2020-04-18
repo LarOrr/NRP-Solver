@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from nrp_logic.entities import Requirement, Stakeholder, NRPInstance
 
 

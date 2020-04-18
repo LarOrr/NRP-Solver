@@ -1,25 +1,18 @@
-import math
-import sys, os
-from shutil import copyfile
-import threading
-from contextlib import contextmanager
+from PyQt5.QtGui import QCursor
+import os
+import sys
 from typing import List
-import pathlib
-from os.path import relpath
 import PyQt5
-from PyQt5 import QtWidgets, QtCore, Qt
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QThreadPool, pyqtSlot, QRunnable
-from PyQt5.QtGui import QCursor, QPalette, QPainter, QBrush, QColor, QPen
-from PyQt5.QtWidgets import QMessageBox, QApplication, QWidget, QProgressDialog, QDesktopWidget, QTableWidgetItem, \
-    QGridLayout, QLabel, QAbstractItemView
-from PyQt5.uic.properties import QtGui
-from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm, GAOperator, SBX, PM, PCX, HUX, \
-    BitFlip, PMX, SPX, TournamentSelector
-
-import gui
+from PyQt5.QtGui import QCursor
+from PyQt5.QtWidgets import QMessageBox, QApplication, QProgressDialog, QDesktopWidget, QTableWidgetItem, \
+    QAbstractItemView
+from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm, GAOperator, HUX, \
+    BitFlip, TournamentSelector
 from gui import main, result_window, picture_window
 from nrp_logic.algorithms import NSGAII_Repair, Repairer
-from nrp_logic.entities import NRPInstance, NRPSolution, Requirement, plot_solutions
+from nrp_logic.entities import NRPInstance, NRPSolution, plot_solutions
 from nrp_logic.problems import NRP_Problem_MO, NRP_Problem_SO, make_solutions
 from util.file_reader import AbstractFileReader, ClassicFileReader, FileReader
 

@@ -1,7 +1,8 @@
-from abc import abstractmethod, ABCMeta
 from typing import List
-from platypus import Problem, Binary, Real, RandomGenerator, Solution
-from nrp_logic.entities import Requirement, Stakeholder, NRPInstance, NRPSolution
+
+from platypus import Problem, Binary, Solution
+
+from nrp_logic.entities import NRPInstance, NRPSolution
 
 
 def make_solutions(nrp: NRPInstance, solutions: List[Solution]) -> List[NRPSolution]:
