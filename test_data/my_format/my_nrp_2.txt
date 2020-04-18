@@ -1,0 +1,13 @@
+B 10000
+7
+Req 1 Red Button;123; PRE 2; PRE 4
+Req 2 Web;120; PRE 4
+Req 3 Home;100000000000; PRE 2; PRE 4
+Req 4: Cool req 4!!!!! ; 13
+Req 5 "Good one";12122;
+Req 6 "Data";15; PRE 4
+Req 7 Table;2; PRE 6
+3
+Stake 1;0.8; 1 1000; 5 10000000000000000000; 2 2
+Stake 2;0.2; 2 0.01; 3 2.12; 7 14
+John John;0.9; 6 10; 2 12; 

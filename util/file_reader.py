@@ -67,6 +67,8 @@ class FileReader(AbstractFileReader):
             weight = float(raw_stake[1])
             values = {}
             for j in range(2, len(raw_stake)):
+                if raw_stake[j] == '':
+                    continue
                 t = raw_stake[j].strip().split()
                 req = int(t[0].strip())
                 val = float(t[1].strip())

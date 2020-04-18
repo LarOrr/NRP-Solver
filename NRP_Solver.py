@@ -9,7 +9,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QMessageBox, QApplication, QProgressDialog, QDesktopWidget, QTableWidgetItem, \
     QAbstractItemView
 from platypus import NSGAII, Problem, Solution, nondominated, AbstractGeneticAlgorithm, GAOperator, HUX, \
-    BitFlip, TournamentSelector
+    BitFlip, TournamentSelector, unique
 from gui import main, result_window, picture_window
 from nrp_logic.algorithms import NSGAII_Repair, Repairer
 from nrp_logic.entities import NRPInstance, NRPSolution, plot_solutions
@@ -126,7 +126,8 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         def run_and_back():
             algorithm.run(nruns)
             print(len(algorithm.result))
-            solutions: List[Solution] = nondominated(algorithm.result)
+            # Only unique non-dominated solutions
+            solutions: List[Solution] = unique(nondominated(algorithm.result))
             solutions = [sol for sol in solutions if sol.feasible]
             print(len(solutions))
 

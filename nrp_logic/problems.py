@@ -22,24 +22,25 @@ def make_solution(nrp: NRPInstance, solution: Solution) -> NRPSolution:
 
 class NRP_Problem_SO(Problem):
     def __init__(self, nrp_instance: NRPInstance):
-        # 1 decision variable, 1 objective, 1 constraint
-        super(NRP_Problem_SO, self).__init__(1, 1, 1)
+        # 1 decision variable, 1 objective, 2 constraint
+        super(NRP_Problem_SO, self).__init__(1, 1, 2)
         self.nrp_instance = nrp_instance
         self.types[:] = Binary(len(nrp_instance.requirements))
         # Maximize score
         self.directions[:] = Problem.MAXIMIZE
         self.constraints[0] = "<={}".format(nrp_instance.budget)
+        self.constraints[1] = ">0"
 
     def evaluate(self, solution: Solution):
         score, cost = self.nrp_instance.get_score_cost(solution.variables[0])
         solution.objectives[:] = [score]
-        solution.constraints[:] = [cost]
+        solution.constraints[:] = [cost, score]
 
 
 class NRP_Problem_MO(Problem):
     def __init__(self, nrp_instance: NRPInstance):
-        # 1 decision variable, 2 objectives, 1 constraint
-        super(NRP_Problem_MO, self).__init__(1, 2, 1)
+        # 1 decision variable, 2 objectives, 2 constraint
+        super(NRP_Problem_MO, self).__init__(1, 2, 2)
         self.nrp_instance = nrp_instance
         self.types[:] = Binary(len(nrp_instance.requirements))
         # Maximize score
@@ -47,9 +48,10 @@ class NRP_Problem_MO(Problem):
         # Changed
         self.directions[1] = Problem.MINIMIZE
         self.constraints[0] = "<={}".format(nrp_instance.budget)
+        self.constraints[1] = ">0"
 
     def evaluate(self, solution: Solution):
         score, cost = self.nrp_instance.get_score_cost(solution.variables[0])
         # Changed
         solution.objectives[:] = [score, cost]
-        solution.constraints[:] = [cost]
+        solution.constraints[:] = [cost, score]
