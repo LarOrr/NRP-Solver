@@ -1,240 +1,242 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>402</width>
-    <height>311</height>
-   </rect>
-  </property>
-  <property name="cursor">
-   <cursorShape>ArrowCursor</cursorShape>
-  </property>
-  <property name="windowTitle">
-   <string>NRP Solver</string>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QGroupBox" name="groupBox_5">
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>File format</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QRadioButton" name="radioCommonFormat">
-         <property name="text">
-          <string>Common format</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="radioClassicFormat">
-         <property name="text">
-          <string>Classic format (for testing)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>Choose file with NRP instance</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLineEdit" name="lineFilePath"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnBrowseFiles">
-         <property name="text">
-          <string>Browse</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="statusTip">
-       <string/>
-      </property>
-      <property name="title">
-       <string>Select multi-objective or single-objective</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QRadioButton" name="radioSingle">
-         <property name="text">
-          <string>Single (Maximize score)</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="radioMulti">
-         <property name="text">
-          <string>Multi (Maximize score and minimize cost)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="title">
-       <string>Use dependencies between requirements?</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QRadioButton" name="radioDependYes">
-         <property name="text">
-          <string>Yes</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="radioDependNo">
-         <property name="text">
-          <string>No</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_4">
-      <property name="title">
-       <string/>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="toolTipDuration">
-          <number>30000</number>
-         </property>
-         <property name="statusTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Number of runs (more runs mean better accuracy but takes more time to execute) : </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineNumOfRuns">
-         <property name="text">
-          <string>1000</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QPushButton" name="btnShowResults">
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-         </font>
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>402</width>
+                <height>311</height>
+            </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
+        <property name="cursor">
+            <cursorShape>ArrowCursor</cursorShape>
         </property>
-        <property name="text">
-         <string>Show results</string>
+        <property name="windowTitle">
+            <string>NRP Solver</string>
         </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnRunSolver">
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Run Solver</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>402</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="contextMenuPolicy">
-    <enum>Qt::NoContextMenu</enum>
-   </property>
-   <widget class="QMenu" name="menuMenu">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionAbout"/>
-   </widget>
-   <addaction name="menuMenu"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
- </widget>
- <resources/>
- <connections/>
+        <widget class="QWidget" name="centralwidget">
+            <layout class="QVBoxLayout" name="verticalLayout">
+                <item>
+                    <widget class="QGroupBox" name="groupBox_5">
+                        <property name="font">
+                            <font>
+                                <pointsize>9</pointsize>
+                            </font>
+                        </property>
+                        <property name="title">
+                            <string>File format</string>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_5">
+                            <item>
+                                <widget class="QRadioButton" name="radioCommonFormat">
+                                    <property name="text">
+                                        <string>Common format</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="radioClassicFormat">
+                                    <property name="text">
+                                        <string>Classic format (for testing)</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QGroupBox" name="groupBox">
+                        <property name="font">
+                            <font>
+                                <pointsize>9</pointsize>
+                            </font>
+                        </property>
+                        <property name="title">
+                            <string>Choose file with NRP instance</string>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout">
+                            <item>
+                                <widget class="QLineEdit" name="lineFilePath"/>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btnBrowseFiles">
+                                    <property name="text">
+                                        <string>Browse</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QGroupBox" name="groupBox_2">
+                        <property name="font">
+                            <font>
+                                <pointsize>9</pointsize>
+                            </font>
+                        </property>
+                        <property name="statusTip">
+                            <string/>
+                        </property>
+                        <property name="title">
+                            <string>Select multi-objective or single-objective</string>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_2">
+                            <item>
+                                <widget class="QRadioButton" name="radioSingle">
+                                    <property name="text">
+                                        <string>Single (Maximize score)</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="radioMulti">
+                                    <property name="text">
+                                        <string>Multi (Maximize score and minimize cost)</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QGroupBox" name="groupBox_3">
+                        <property name="font">
+                            <font>
+                                <pointsize>9</pointsize>
+                            </font>
+                        </property>
+                        <property name="title">
+                            <string>Use dependencies between requirements?</string>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_3">
+                            <item>
+                                <widget class="QRadioButton" name="radioDependYes">
+                                    <property name="text">
+                                        <string>Yes</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="radioDependNo">
+                                    <property name="text">
+                                        <string>No</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QGroupBox" name="groupBox_4">
+                        <property name="title">
+                            <string/>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_2">
+                            <item>
+                                <widget class="QLabel" name="label">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>9</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="toolTipDuration">
+                                        <number>30000</number>
+                                    </property>
+                                    <property name="statusTip">
+                                        <string/>
+                                    </property>
+                                    <property name="text">
+                                        <string>Number of runs (more runs mean better accuracy but takes more time to
+                                            execute) :
+                                        </string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLineEdit" name="lineNumOfRuns">
+                                    <property name="text">
+                                        <string>1000</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </item>
+                <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                        <item>
+                            <widget class="QPushButton" name="btnShowResults">
+                                <property name="font">
+                                    <font>
+                                        <pointsize>9</pointsize>
+                                    </font>
+                                </property>
+                                <property name="autoFillBackground">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="text">
+                                    <string>Show results</string>
+                                </property>
+                                <property name="checkable">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="btnRunSolver">
+                                <property name="font">
+                                    <font>
+                                        <pointsize>9</pointsize>
+                                    </font>
+                                </property>
+                                <property name="text">
+                                    <string>Run Solver</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </item>
+            </layout>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>402</width>
+                    <height>18</height>
+                </rect>
+            </property>
+            <property name="contextMenuPolicy">
+                <enum>Qt::NoContextMenu</enum>
+            </property>
+            <widget class="QMenu" name="menuMenu">
+                <property name="title">
+                    <string>Help</string>
+                </property>
+                <addaction name="actionAbout"/>
+            </widget>
+            <addaction name="menuMenu"/>
+        </widget>
+        <widget class="QStatusBar" name="statusbar"/>
+        <action name="actionAbout">
+            <property name="text">
+                <string>About</string>
+            </property>
+        </action>
+    </widget>
+    <resources/>
+    <connections/>
 </ui>

@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from nrp_logic.entities import Requirement, Stakeholder, NRPInstance
-# from nrp_logic.nrp import
-# from nrp_logic.Stakeholder import Stakeholder
+
 
 class AbstractFileReader(ABC):
     @abstractmethod
@@ -54,13 +53,9 @@ class FileReader(AbstractFileReader):
                 else:
                     raise NotImplementedError()
 
-        # TODO through setter
         for i, req in enumerate(requirements):
             for p in prereqs[i]:
                 requirements[i].add_prerequisite(requirements[p - 1])
-            # TODO add dep!!!
-            # for id, req_cost_str in enumerate(req_costs):
-            #     requirements.append(Requirement(req_id=id + 1, cost=float(req_cost_str)))
         line_ind += number_of_req
         # 2.1 Get stakeholders info
         number_of_stake = int(lines[line_ind])
@@ -77,8 +72,9 @@ class FileReader(AbstractFileReader):
                 values[req] = val
             stakeholders.append(Stakeholder(name=name, weight=weight, values=values))
 
-        nrp = NRPInstance(requirements, stakeholders, budget= budget, budget_ratio=ratio)
+        nrp = NRPInstance(requirements, stakeholders, budget=budget, budget_ratio=ratio)
         return nrp
+
 
 class ClassicFileReader(AbstractFileReader):
     def read_nrp_instance(self, filename):
@@ -102,7 +98,7 @@ class ClassicFileReader(AbstractFileReader):
             line_index = 0
         if ratio is None:
             # Default ratio
-            ratio = 0.3
+            ratio = 0.7
 
         # 1.1 get requirements
         number_of_levels = int(lines[line_index])

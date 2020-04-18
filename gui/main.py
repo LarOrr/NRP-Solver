@@ -146,7 +146,8 @@ class Ui_MainWindow(object):
         self.groupBox_3.setTitle(_translate("MainWindow", "Use dependencies between requirements?"))
         self.radioDependYes.setText(_translate("MainWindow", "Yes"))
         self.radioDependNo.setText(_translate("MainWindow", "No"))
-        self.label.setText(_translate("MainWindow", "Number of runs (more runs mean better accuracy but takes more time to execute) : "))
+        self.label.setText(_translate("MainWindow",
+                                      "Number of runs (more runs mean better accuracy but takes more time to execute) : "))
         self.lineNumOfRuns.setText(_translate("MainWindow", "10000"))
         self.btnShowResults.setText(_translate("MainWindow", "Show results"))
         self.btnRunSolver.setText(_translate("MainWindow", "Run Solver"))

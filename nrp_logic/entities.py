@@ -2,26 +2,20 @@ from typing import List, Set
 import matplotlib.pyplot as plt
 
 
-# from __future__ import annotations
-
-
 class Requirement:
     def __init__(self, cost=0, name=None, req_id=0):
         if name is None:
             name = "Req_" + str(req_id)
         self.req_id: int = req_id
-        self.cost: int = cost
+        self.cost: float = cost
         self.name: str = name
-        self.score = None
-        # if prerequisites is None:
-        #     # TODO ?
-        #     prerequisites = set()
+        self.score: float = None
         self.prerequisites: Set[Requirement] = set()
 
-    def add_prerequisite(self, prerequisite):
+    def add_prerequisite(self, prerequisite) -> None:
         self.prerequisites.add(prerequisite)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return 'Id_{}: "{}"'.format(self.req_id, self.name)
 
 
@@ -31,38 +25,37 @@ class Stakeholder:
             values = {}
         self.name = name
         self.weight = weight
-        # TODO dict
         self.req_values = values
 
 
 class NRPInstance:
-    # __metaclass__ = ABCMeta
-
-    def __init__(self, requirements: List[Requirement] = None, stakeholders: List[Stakeholder] = None, budget=None,
-                 budget_ratio=None):
-        self.requirements = requirements
-        self.stakeholders = stakeholders
-        self.total_cost = None
-        self.total_score = None
+    def __init__(self, requirements: List[Requirement] = None, stakeholders: List[Stakeholder] = None,
+                 budget: float = None,
+                 budget_ratio: float = None):
+        self.requirements: List[Requirement] = requirements
+        self.stakeholders: List[Stakeholder] = stakeholders
+        self.total_cost: float = None
+        self.total_score: float = None
         max_budg = self.__get_max_budget(budget_ratio)
         if budget is None:
             budget = max_budg
             if budget_ratio is not None:
                 budget *= budget_ratio
-        self.budget = budget
-        # TODO when?
+        self.budget: float = budget
+        # TODO find better place to put it:
         self.calculate_scores()
         self.trans_closure_all()
 
-    def calculate_scores(self):
+    def calculate_scores(self) -> float:
         self.total_score = 0
         for r in self.requirements:
             r.score = 0
             for s in self.stakeholders:
                 r.score += s.weight * s.req_values.get(r.req_id, 0)
             self.total_score += r.score
+        return self.total_score
 
-    def __get_max_budget(self, budget_ratio):
+    def __get_max_budget(self, budget_ratio: float) -> float:
         self.total_cost = 0
         sum = 0
         for req in self.requirements:
@@ -70,7 +63,7 @@ class NRPInstance:
         self.total_cost = sum
         return sum
 
-    def get_score_cost(self, candidate: List[bool]):
+    def get_score_cost(self, candidate: List[bool]) -> (float, float):
         # score is a sum of all customer weighted scores
         score = 0
         cost = 0
@@ -96,9 +89,10 @@ class NRPInstance:
     #         for p in prereq.prerequisites:
     #             stack.append(p)
 
-    def trans_closure(self, req: Requirement):
+    def trans_closure(self, req: Requirement) -> None:
         def cycle_error():
             raise RuntimeError("Cycle in the requirements dependencies!")
+
         # To detect a cycle in requirements tree
         visited = [False] * len(self.requirements)
         on_stack = [False] * len(self.requirements)
@@ -167,4 +161,3 @@ def plot_solutions(solutions: List[NRPSolution], budget, title, file_name='last_
     plt.ylim([ymin, ymax])
     plt.savefig(file_name)
     return file_name
-

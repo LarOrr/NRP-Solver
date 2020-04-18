@@ -3,6 +3,7 @@ from platypus import Problem, Binary, Real, RandomGenerator, Solution, NSGAII, n
     default_variator, TournamentSelector
 from nrp_logic.entities import Requirement
 
+
 class Repairer:
     def __init__(self, requirements: List[Requirement]):
         self.requirements = requirements
@@ -15,9 +16,8 @@ class Repairer:
     def repair(self, sol: Solution):
         include_req = sol.variables[0]
         for i, is_met in enumerate(include_req):
-            # ! Transitive closed requirement!
+            # ! Works for transitive closed requirements!
             if is_met:
-                # delete = False
                 req = self.requirements[i]
                 for prereq in req.prerequisites:
                     if not include_req[prereq.req_id - 1]:

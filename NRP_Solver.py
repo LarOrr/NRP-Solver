@@ -20,7 +20,7 @@ import gui
 from gui import main, result_window, picture_window
 from nrp_logic.algorithms import NSGAII_Repair, Repairer
 from nrp_logic.entities import NRPInstance, NRPSolution, Requirement, plot_solutions
-from nrp_logic.nrp import NRP_Problem_MO, NRP_Problem_SO, make_solutions
+from nrp_logic.problems import NRP_Problem_MO, NRP_Problem_SO, make_solutions
 from util.file_reader import AbstractFileReader, ClassicFileReader, FileReader
 
 
@@ -53,54 +53,6 @@ class Worker(QRunnable):
         self.fn(*self.args, **self.kwargs)
 
 
-# @contextmanager
-# def wait_cursor():
-#     try:
-#         QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
-#         yield
-#     finally:
-#         QApplication.restoreOverrideCursor()
-
-
-# class Overlay(QWidget):
-#
-#     def __init__(self, parent=None):
-#         QWidget.__init__(self, parent)
-#         palette = QPalette(self.palette())
-#         palette.setColor(palette.Background, QtCore.Qt.transparent)
-#         self.setPalette(palette)
-#
-#     def paintEvent(self, event):
-#
-#         painter = QPainter()
-#         painter.begin(self)
-#         painter.setRenderHint(QPainter.Antialiasing)
-#         painter.fillRect(event.rect(), QBrush(QColor(255, 255, 255, 127)))
-#         painter.setPen(QPen(QtCore.Qt.NoPen))
-#
-#         for i in range(6):
-#             if (self.counter / 5) % 6 == i:
-#                 painter.setBrush(QBrush(QColor(127 + (self.counter % 5) * 32, 127, 127)))
-#             else:
-#                 painter.setBrush(QBrush(QColor(127, 127, 127)))
-#             painter.drawEllipse(
-#                 self.width() / 2 + 30 * math.cos(2 * math.pi * i / 6.0) - 10,
-#                 self.height() / 2 + 30 * math.sin(2 * math.pi * i / 6.0) - 10,
-#                 20, 20)
-#
-#         painter.end()
-#
-#     def showEvent(self, event):
-#
-#         self.timer = self.startTimer(50)
-#         self.counter = 0
-#
-#     def timerEvent(self, event):
-#         self.counter += 1
-#         self.update()
-#         if self.counter == 60:
-#             self.killTimer(self.timer)
-#             self.hide()
 class Window:
     def show_simple_error(self, text: str):
         msg = QMessageBox()
@@ -120,16 +72,11 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         self.nrp_instance = None
         self.btnBrowseFiles.clicked.connect(self.browse_folder)
         self.btnRunSolver.clicked.connect(self.run_algorithm)
-        # TODO DEBUG uncomment
         self.btnShowResults.setDisabled(True)
         self.btnShowResults.clicked.connect(self.show_result_window)
         self.actionAbout.triggered.connect(self.show_about)
 
     def run_algorithm(self):
-        # TODO DEBUG delete line for testing
-        # self.lineFilePath.setText('C:/Users/Lar/Documents/Study/CouseWork-3/PyProgramNRP/test_data/classic/nrp3.txt')
-        # self.radioClassicFormat.setChecked()
-
         file_path = self.lineFilePath.text()
         if file_path == "":
             self.show_simple_error("Please choose file!")
@@ -168,9 +115,10 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         #  Dep or without dep
         if self.radioDependYes.isChecked():
             # TODO fix req for rep
-            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements), variator=variator, selector=selector)
+            algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements), variator=variator,
+                                      selector=selector)
         else:
-            algorithm = NSGAII(nrp_problem, variator=variator,selector=selector)
+            algorithm = NSGAII(nrp_problem, variator=variator, selector=selector)
         #  Take n runs
         try:
             nruns = int(self.lineNumOfRuns.text())
@@ -207,7 +155,6 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         def set_view(view):
             view.show()
             self.view = view
-
             resolution = QDesktopWidget().screenGeometry()
             view.move((resolution.width() / 2) - (view.frameSize().width() / 2),
                       (resolution.height() / 2) - (view.frameSize().height() / 2))
@@ -248,7 +195,6 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         msg.exec_()
 
     def show_result_window(self):
-        # TODO DEBUG uncomment!
         if self.result is None:
             self.show_simple_error('You have to run the algorithm first!')
             return
@@ -268,7 +214,8 @@ class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindow, Window)
         self.close()
         self.nrp_instance = nrp_instance
         self.labelTotalInfo.setText("Budget = {} || Total cost of all req. = {} || Total score of all req. = {} "
-                                    .format(round(nrp_instance.budget, 2), round(nrp_instance.total_cost, 2), round(nrp_instance.total_score, 2)))
+                                    .format(round(nrp_instance.budget, 2), round(nrp_instance.total_cost, 2),
+                                            round(nrp_instance.total_score, 2)))
         self.labels = ['Total Score', 'Total Cost', 'List of requirements']
         self.fill_table()
         # TODO save img
@@ -277,20 +224,9 @@ class ResultWindow(QtWidgets.QMainWindow, result_window.Ui_ResultWindow, Window)
         self.btnVisualize.clicked.connect(self.show_visualisation)
 
     def fill_table(self):
-        # TODO DEBUG  delete
-        # if self.result is None:
-        #     self.result = [NRPSolution(total_score=100,total_cost=200, requirements=[Requirement(req_id=1, name="))))))"), Requirement(req_id=2, name="aewrwrr"), Requirement(req_id=23, name="dsf))))))"),
-        #                                                                               Requirement(req_id=21,
-        #                                                                                           name="sfdfr")]),
-        #                    NRPSolution(total_score=333, total_cost=444, requirements=[Requirement(req_id=23, name="dsf))))))"),
-        #                                                                               Requirement(req_id=21,
-        #                                                                                           name="sfdfr")])]
-        # self.resize(417, 261)
         table = self.tableResult
         table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        # '№',
-        # labels = ['Total score', 'Total Cost', 'List of requirements']
         table.setColumnCount(len(self.labels))
         table.setRowCount(len(self.result))
         table.setHorizontalHeaderLabels(self.labels)
