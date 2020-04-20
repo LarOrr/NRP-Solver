@@ -1,6 +1,6 @@
-from PyQt5.QtGui import QCursor
 import os
 import sys
+import time
 from typing import List
 import PyQt5
 from PyQt5 import QtWidgets, QtCore
@@ -14,7 +14,7 @@ from gui import main, result_window, picture_window
 from nrp_logic.algorithms import NSGAII_Repair, Repairer
 from nrp_logic.entities import NRPInstance, NRPSolution, plot_solutions
 from nrp_logic.problems import NRP_Problem_MO, NRP_Problem_SO, make_solutions
-from util.file_reader import AbstractFileReader, ClassicFileReader, FileReader
+from util.file_reader import AbstractFileReader, ClassicFileReader, CommonFileReader
 
 
 class Worker(QRunnable):
@@ -59,6 +59,7 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         super().__init__()
 
         self.setupUi(self)
+        # Is last chosen format is single-objective
         self.is_last_single = False
         self.threadpool = QThreadPool()
         self.result = None
@@ -80,7 +81,7 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
         if self.radioClassicFormat.isChecked():
             reader = ClassicFileReader()
         else:
-            reader = FileReader()
+            reader = CommonFileReader()
         try:
             self.nrp_instance: NRPInstance = reader.read_nrp_instance(filename=file_path)
         except RuntimeError as ex:
@@ -100,14 +101,13 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
 
         algorithm: AbstractGeneticAlgorithm = None
         # TODO Move somewhere and add config
-        # Crossover probability is 0.9 and mutation probability = 1 / (size of binary vector)
+        # Crossover probability is 0.8 and mutation probability = 1 / (size of binary vector)
         variator = None
-        # TODO single-point crossover?
+        # TODO try single-point crossover
         variator = GAOperator(HUX(probability=0.8), BitFlip(probability=1))
         selector = TournamentSelector(5)
         #  Dep or without dep
         if self.radioDependYes.isChecked():
-            # TODO fix req for rep
             algorithm = NSGAII_Repair(nrp_problem, repairer=Repairer(self.nrp_instance.requirements), variator=variator,
                                       selector=selector)
         else:
@@ -122,44 +122,54 @@ class MainApp(QtWidgets.QMainWindow, main.Ui_MainWindow, Window):
             self.show_simple_error("Number of runs must be integer!")
             return
 
-        # TODO fix this
-        def run_and_back():
-            algorithm.run(nruns)
-            print(len(algorithm.result))
-            # Only unique non-dominated solutions
-            solutions: List[Solution] = unique(nondominated(algorithm.result))
-            solutions = [sol for sol in solutions if sol.feasible]
-            print(len(solutions))
+        self.wait_start()
+        worker = Worker(self.run_and_back, algorithm, nruns)
+        self.threadpool.start(worker)
 
-            result: List[NRPSolution] = make_solutions(self.nrp_instance, solutions)
-            # Sorting for 2 objectives First maximize score and then minimize cost
-            result = sorted(result, key=lambda x: x.total_score, reverse=True)
-            if self.is_last_single:
-                result = sorted(result, key=lambda x: x.total_cost)
-                # Taking only solution with minimal cost
-                result = [result[0]]
-            self.result = result
-            #  TODO separate method
-            self.view.hide()
-            QApplication.restoreOverrideCursor()
-            self.setDisabled(False)
-            self.btnShowResults.setDisabled(False)
-            self.btnShowResults.setStyleSheet("background-color: lime")
+    def run(self, algorithm: AbstractGeneticAlgorithm, nruns: int) -> List[NRPSolution]:
+        algorithm.run(nruns)
+        print(len(algorithm.result))
+        # Only unique non-dominated solutions
+        solutions: List[Solution] = unique(nondominated(algorithm.result))
+        solutions = [sol for sol in solutions if sol.feasible]
+        print(len(solutions))
 
-        def set_view(view):
-            view.show()
-            self.view = view
-            resolution = QDesktopWidget().screenGeometry()
-            view.move((resolution.width() / 2) - (view.frameSize().width() / 2),
-                      (resolution.height() / 2) - (view.frameSize().height() / 2))
+        result: List[NRPSolution] = make_solutions(self.nrp_instance, solutions)
+        # Sorting for 2 objectives First maximize score and then minimize cost
+        result = sorted(result, key=lambda x: x.total_score, reverse=True)
+        if self.is_last_single:
+            result = sorted(result, key=lambda x: x.total_cost)
+            # Taking only solution with minimal cost
+            result = [result[0]]
+        return result
 
+    def run_and_back(self, algorithm: AbstractGeneticAlgorithm, nruns: int):
+        time1 = time.time()
+        self.result = self.run(algorithm, nruns)
+        time2 = time.time()
+        print("time: {}".format(time2 - time1))
+        self.wait_end()
+
+    def wait_start(self):
         wait = QProgressDialog('Please, wait for algorithm execution...', None, 0, 0)
         wait.setWindowTitle('Status')
-        set_view(wait)
+        self.set_view(wait)
         self.setDisabled(True)
         QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
-        worker = Worker(run_and_back)
-        self.threadpool.start(worker)
+
+    def set_view(self, view):
+        view.show()
+        self.view = view
+        resolution = QDesktopWidget().screenGeometry()
+        view.move((resolution.width() / 2) - (view.frameSize().width() / 2),
+                  (resolution.height() / 2) - (view.frameSize().height() / 2))
+
+    def wait_end(self):
+        self.view.hide()
+        QApplication.restoreOverrideCursor()
+        self.setDisabled(False)
+        self.btnShowResults.setDisabled(False)
+        self.btnShowResults.setStyleSheet("background-color: lime")
 
     def show_file_error(self, ex: Exception, message: str = "Format of file is incorrect."):
         msg = QMessageBox()

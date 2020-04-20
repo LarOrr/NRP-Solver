@@ -9,8 +9,10 @@ class AbstractFileReader(ABC):
         pass
 
 
-class FileReader(AbstractFileReader):
-    # @abstractmethod
+class CommonFileReader(AbstractFileReader):
+    """
+       Reader for common  format
+    """
     def read_nrp_instance(self, filename):
         # TODO where to eval score?
         stakeholders = []
@@ -47,10 +49,7 @@ class FileReader(AbstractFileReader):
                     continue
                 req_id = int(req_id)
                 if dependency_type == 'PRE':
-                    # prereqs.append(req_id)
                     prereqs[i].append(req_id)
-                    # new_req.add_prerequisi
-                    # te(requirements[req_id - 1])
                 else:
                     raise NotImplementedError()
 
@@ -80,6 +79,10 @@ class FileReader(AbstractFileReader):
 
 
 class ClassicFileReader(AbstractFileReader):
+    """
+    Reader for classic format
+    """
+
     def read_nrp_instance(self, filename):
         requirements = []
 

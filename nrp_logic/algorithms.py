@@ -14,8 +14,11 @@ class Repairer:
         for s in sols:
             self.repair(s)
 
-    # TODO positive repair
+    # TODO try positive repair
     def repair(self, sol: Solution):
+        """
+        Repairs the solution
+        """
         include_req = sol.variables[0]
         for i, is_met in enumerate(include_req):
             # ! Works for transitive closed requirements!
@@ -40,6 +43,7 @@ class NSGAII_Repair(NSGAII):
         super(NSGAII_Repair, self).__init__(problem, population_size, generator, selector, variator, archive, **kwargs)
         self.repairer = repairer
 
+    # Overloading of initialize
     def initialize(self):
         self.population = [self.generator.generate(self.problem) for _ in range(self.population_size)]
         # Modification:

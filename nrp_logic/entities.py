@@ -47,6 +47,10 @@ class NRPInstance:
         self.trans_closure_all()
 
     def calculate_scores(self) -> float:
+        """
+        Calculates scores for requirements and total score
+        :return: total score
+        """
         self.total_score = 0
         for r in self.requirements:
             r.score = 0
@@ -90,6 +94,10 @@ class NRPInstance:
     #             stack.append(p)
 
     def trans_closure(self, req: Requirement) -> None:
+        """
+        Transitive closure for requirement with check for cycles
+        :except: RuntimeErrpor
+        """
         def cycle_error():
             raise RuntimeError("Cycle in the requirements dependencies!")
 
@@ -130,6 +138,9 @@ class NRPSolution:
 
 
 def plot_solutions(solutions: List[NRPSolution], budget, title, file_name='last_result.png'):
+    """
+    Plots solutions and saves the picture
+    """
     plt.clf()
     xs = [s.total_score for s in solutions]
     ys = [s.total_cost for s in solutions]

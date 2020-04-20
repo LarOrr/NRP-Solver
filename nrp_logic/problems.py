@@ -13,6 +13,9 @@ def make_solutions(nrp: NRPInstance, solutions: List[Solution]) -> List[NRPSolut
 
 
 def make_solution(nrp: NRPInstance, solution: Solution) -> NRPSolution:
+    """
+    Makes NRP_Solution out of Platypus Solution
+    """
     reqs = []
     for i, is_met in enumerate(solution.variables[0]):
         if is_met:
@@ -25,9 +28,11 @@ class NRP_Problem_SO(Problem):
         # 1 decision variable, 1 objective, 2 constraint
         super(NRP_Problem_SO, self).__init__(1, 1, 2)
         self.nrp_instance = nrp_instance
+        # Binary solution with size of number of requirements
         self.types[:] = Binary(len(nrp_instance.requirements))
         # Maximize score
         self.directions[:] = Problem.MAXIMIZE
+        #  Cost <= budget and score > 0
         self.constraints[0] = "<={}".format(nrp_instance.budget)
         self.constraints[1] = ">0"
 
@@ -45,7 +50,7 @@ class NRP_Problem_MO(Problem):
         self.types[:] = Binary(len(nrp_instance.requirements))
         # Maximize score
         self.directions[0] = Problem.MAXIMIZE
-        # Changed
+        # Minimize cost
         self.directions[1] = Problem.MINIMIZE
         self.constraints[0] = "<={}".format(nrp_instance.budget)
         self.constraints[1] = ">0"
